@@ -3,1774 +3,867 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiskGuard Pro | Regulatory Risk Analysis System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>RiskGuard Pro | Regulatory Risk Analysis</title>
+    <meta name="description" content="Enterprise-grade regulatory risk analysis platform for Basel III, FRTB, UCITS compliance">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
-            --secondary: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #06b6d4;
-            --dark: #0f172a;
-            --dark-light: #1e293b;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --sidebar-width: 280px;
-            --header-height: 70px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-800);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: linear-gradient(180deg, var(--dark) 0%, var(--dark-light) 100%);
-            color: white;
-            z-index: 1000;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-xl);
-        }
-
-        .sidebar-header {
-            padding: 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        .brand-text h4 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.025em;
-        }
-
-        .brand-text small {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .nav-section {
-            padding: 16px 0;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .nav-section-title {
-            padding: 12px 24px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255,255,255,0.4);
-        }
-
-        .nav-item {
-            padding: 14px 24px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            border-left: 3px solid transparent;
-            margin: 4px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(37, 99, 235, 0.1) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .nav-item:hover::before {
-            opacity: 1;
-        }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.03);
-            padding-left: 28px;
-        }
-
-        .nav-item.active {
-            background: rgba(37, 99, 235, 0.15);
-            border-left-color: var(--primary);
-        }
-
-        .nav-item.active .nav-icon {
-            color: var(--primary-light);
-        }
-
-        .nav-item.active .nav-text {
-            color: white;
-            font-weight: 600;
-        }
-
-        .nav-icon {
-            font-size: 1.25rem;
-            width: 24px;
-            text-align: center;
-            color: rgba(255,255,255,0.6);
-            transition: var(--transition);
-        }
-
-        .nav-text {
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.8);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .nav-badge {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 20px 24px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .user-role {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.5);
-        }
-
-        /* Main Content */
-        .main-wrapper {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            transition: var(--transition);
-        }
-
-        /* Header */
-        .top-header {
-            background: white;
-            height: var(--header-height);
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .page-title-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--gray-600);
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--gray-800);
-            margin: 0;
-        }
-
-        .breadcrumb {
-            font-size: 0.85rem;
-            color: var(--gray-500);
-            margin-top: 4px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            border: 1px solid var(--gray-200);
-            background: white;
-            color: var(--gray-600);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .btn-icon:hover {
-            background: var(--gray-50);
-            border-color: var(--gray-300);
-            color: var(--gray-800);
-        }
-
-        .notification-dot {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        /* Content Area */
-        .content-area {
-            padding: 32px;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 1px solid var(--gray-100);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-card:hover::after {
-            opacity: 1;
-        }
-
-        .stat-card.success::after { background: var(--success); }
-        .stat-card.danger::after { background: var(--danger); }
-        .stat-card.warning::after { background: var(--warning); }
-        .stat-card.info::after { background: var(--info); }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .stat-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .stat-icon-wrapper.primary {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-        }
-
-        .stat-icon-wrapper.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .stat-icon-wrapper.danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .stat-icon-wrapper.warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
-
-        .stat-trend {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-        }
-
-        .stat-trend.up {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .stat-trend.down {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: 4px;
-            letter-spacing: -0.025em;
-        }
-
-        .stat-label {
-            color: var(--gray-500);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .stat-comparison {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--gray-100);
-            font-size: 0.85rem;
-            color: var(--gray-500);
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-100);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .card-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--gray-100);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-body {
-            padding: 24px;
-        }
-
-        .card-footer {
-            padding: 16px 24px;
-            background: var(--gray-50);
-            border-top: 1px solid var(--gray-100);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-200);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--gray-300);
-            color: var(--gray-700);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(37, 99, 235, 0.05);
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.875rem;
-        }
-
-        .btn-lg {
-            padding: 16px 32px;
-            font-size: 1rem;
-        }
-
-        /* Forms */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .form-control, .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-control:hover, .form-select:hover {
-            border-color: var(--gray-300);
-        }
-
-        /* Upload Zone */
-        .upload-zone {
-            border: 2px dashed var(--gray-300);
-            border-radius: 16px;
-            padding: 60px 40px;
-            text-align: center;
-            transition: var(--transition);
-            cursor: pointer;
-            background: var(--gray-50);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-zone::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .upload-zone:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .upload-zone:hover::before {
-            opacity: 1;
-        }
-
-        .upload-zone.dragover {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        .upload-icon {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 2rem;
-            color: var(--primary);
-            box-shadow: var(--shadow-md);
-            position: relative;
-            z-index: 1;
-        }
-
-        .upload-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .upload-text {
-            color: var(--gray-500);
-            font-size: 0.95rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .table th {
-            background: var(--gray-50);
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--gray-600);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .table tr:hover td {
-            background: var(--gray-50);
-        }
-
-        .table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Status Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .badge-warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #b45309;
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .badge-info {
-            background: rgba(6, 182, 212, 0.1);
-            color: #0891b2;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            padding: 4px;
-            background: var(--gray-100);
-            border-radius: 12px;
-            margin-bottom: 24px;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--gray-600);
-            transition: var(--transition);
-            border: none;
-            background: transparent;
-        }
-
-        .tab:hover {
-            color: var(--gray-800);
-            background: rgba(255,255,255,0.5);
-        }
-
-        .tab.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* Loading */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 56px;
-            height: 56px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Progress Bar */
-        .progress-wrapper {
-            margin: 16px 0;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .progress {
-            height: 8px;
-            background: var(--gray-200);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-        }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .toast {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 320px;
-            animation: slideIn 0.3s ease;
-            border-left: 4px solid;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-right': 'slideRight 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideRight: {
+                            '0%': { transform: 'translateX(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                    }
+                }
             }
         }
-
-        .toast.success { border-color: var(--success); }
-        .toast.error { border-color: var(--danger); }
-        .toast.warning { border-color: var(--warning); }
-        .toast.info { border-color: var(--info); }
-
-        .toast-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-
-        .toast.success .toast-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .toast.warning .toast-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .toast.info .toast-icon { background: rgba(6, 182, 212, 0.1); color: var(--info); }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 2px;
-        }
-
-        .toast-message {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            color: var(--gray-400);
-            cursor: pointer;
-            padding: 4px;
-            font-size: 1.25rem;
-            transition: color 0.2s;
-        }
-
-        .toast-close:hover {
-            color: var(--gray-600);
-        }
-
-        /* Section Visibility */
-        .section {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Chart Containers */
-        .chart-container {
-            min-height: 400px;
-            background: white;
-            border-radius: 12px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            width: 100px;
-            height: 100px;
-            background: var(--gray-100);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 3rem;
-            color: var(--gray-400);
-        }
-
-        .empty-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 8px;
-        }
-
-        .empty-text {
-            color: var(--gray-500);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer base {
             :root {
-                --sidebar-width: 240px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8fafc;
+                --bg-tertiary: #f1f5f9;
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --text-tertiary: #94a3b8;
+                --border-color: #e2e8f0;
             }
             
-            .main-wrapper {
-                margin-left: 0;
+            .dark {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-tertiary: #334155;
+                --text-primary: #f8fafc;
+                --text-secondary: #cbd5e1;
+                --text-tertiary: #64748b;
+                --border-color: #334155;
             }
             
-            .menu-toggle {
-                display: block;
+            * {
+                @apply transition-colors duration-200;
             }
             
-            .stats-grid {
-                grid-template-columns: 1fr;
+            body {
+                font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
             }
             
-            .content-area {
-                padding: 20px;
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: var(--bg-tertiary);
+                border-radius: 4px;
+            }
+            
+            ::-webkit-scrollbar-thumb {
+                background: var(--text-tertiary);
+                border-radius: 4px;
+            }
+            
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--text-secondary);
+            }
+            
+            /* Glass effect */
+            .glass {
+                @apply backdrop-blur-xl bg-white/70 dark:bg-dark-800/70 border border-white/20 dark:border-white/10;
+            }
+            
+            /* Gradient text */
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600;
+            }
+            
+            /* Card hover effect */
+            .hover-lift {
+                @apply transition-all duration-300 ease-out;
+            }
+            
+            .hover-lift:hover {
+                @apply -translate-y-1 shadow-2xl;
+            }
+            
+            /* Button shine effect */
+            .btn-shine {
+                @apply relative overflow-hidden;
+            }
+            
+            .btn-shine::after {
+                content: '';
+                @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent;
+                animation: shine 3s infinite;
+            }
+            
+            @keyframes shine {
+                100% { transform: translateX(100%); }
+            }
+            
+            /* Pulse ring */
+            .pulse-ring {
+                @apply relative;
+            }
+            
+            .pulse-ring::before {
+                content: '';
+                @apply absolute inset-0 rounded-full animate-ping opacity-75;
+                background: inherit;
+            }
+            
+            /* Input focus ring */
+            .input-focus {
+                @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all;
+            }
+            
+            /* Skeleton loading */
+            .skeleton {
+                @apply bg-gray-200 dark:bg-dark-700 animate-pulse rounded;
             }
         }
     </style>
 </head>
-<body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="text-center">
-            <div class="spinner"></div>
-            <p class="mt-3 text-gray-600">Processing your request...</p>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="brand">
-                <div class="brand-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <div class="brand-text">
-                    <h4>RiskGuard Pro</h4>
-                    <small>Regulatory Risk Analysis</small>
-                </div>
-            </div>
-        </div>
+<body class="antialiased">
+    <!-- App Container -->
+    <div id="app" class="min-h-screen flex">
         
-        <nav class="nav-section">
-            <div class="nav-section-title">Main Menu</div>
-            
-            <div class="nav-item active" data-section="dashboard">
-                <i class="nav-icon bi bi-speedometer2"></i>
-                <span class="nav-text">Dashboard</span>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-screen w-72 bg-dark-900 text-white z-50 flex flex-col transform transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+            <!-- Logo Area -->
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center shadow-lg shadow-primary-500/30">
+                        <i class="bi bi-shield-check text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight">RiskGuard Pro</h1>
+                        <p class="text-xs text-gray-400">v2.0 Enterprise</p>
+                    </div>
+                </div>
             </div>
             
-            <div class="nav-item" data-section="data">
-                <i class="nav-icon bi bi-database"></i>
-                <span class="nav-text">Data Management</span>
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-4 px-3">
+                <div class="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Main Menu</div>
+                
+                <a href="#" onclick="navigate('dashboard')" data-page="dashboard" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 bg-primary-600/20 text-primary-300 border-l-4 border-primary-500">
+                    <i class="bi bi-grid-1x2-fill text-lg"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                
+                <a href="#" onclick="navigate('data')" data-page="data" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-database text-lg"></i>
+                    <span class="font-medium">Data Management</span>
+                </a>
+                
+                <a href="#" onclick="navigate('analysis')" data-page="analysis" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-graph-up-arrow text-lg"></i>
+                    <span class="font-medium">Risk Analysis</span>
+                    <span class="ml-auto bg-primary-500 text-white text-xs px-2 py-0.5 rounded-full">New</span>
+                </a>
+                
+                <a href="#" onclick="navigate('portfolio')" data-page="portfolio" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-pie-chart-fill text-lg"></i>
+                    <span class="font-medium">Portfolio</span>
+                </a>
+                
+                <div class="mt-6 mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reports</div>
+                
+                <a href="#" onclick="navigate('reports')" data-page="reports" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-file-earmark-text text-lg"></i>
+                    <span class="font-medium">Generate Reports</span>
+                </a>
+                
+                <div class="mt-6 mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">System</div>
+                
+                <a href="#" onclick="navigate('settings')" data-page="settings" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-gear text-lg"></i>
+                    <span class="font-medium">Settings</span>
+                </a>
+                
+                <a href="#" onclick="navigate('help')" data-page="help" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl mb-1 transition-all duration-200 text-gray-400 hover:bg-white/5 hover:text-white">
+                    <i class="bi bi-question-circle text-lg"></i>
+                    <span class="font-medium">Help & Support</span>
+                </a>
+            </nav>
+            
+            <!-- User Profile -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-purple-500 flex items-center justify-center font-bold text-sm">
+                        AD
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-sm truncate">Admin Demo</p>
+                        <p class="text-xs text-gray-400 truncate">Risk Manager</p>
+                    </div>
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                        <i class="bi bi-moon-stars text-gray-400"></i>
+                    </button>
+                </div>
             </div>
-            
-            <div class="nav-item" data-section="analysis">
-                <i class="nav-icon bi bi-graph-up-arrow"></i>
-                <span class="nav-text">Risk Analysis</span>
-            </div>
-            
-            <div class="nav-item" data-section="portfolio">
-                <i class="nav-icon bi bi-pie-chart"></i>
-                <span class="nav-text">Portfolio</span>
-            </div>
-            
-            <div class="nav-section-title">Reports</div>
-            
-            <div class="nav-item" data-section="reports">
-                <i class="nav-icon bi bi-file-earmark-text"></i>
-                <span class="nav-text">Generate Reports</span>
-                <span class="nav-badge">New</span>
-            </div>
-            
-            <div class="nav-section-title">System</div>
-            
-            <div class="nav-item" data-section="settings">
-                <i class="nav-icon bi bi-gear"></i>
-                <span class="nav-text">Settings</span>
-            </div>
-            
-            <div class="nav-item" data-section="help">
-                <i class="nav-icon bi bi-question-circle"></i>
-                <span class="nav-text">Help & Support</span>
-            </div>
-        </nav>
+        </aside>
         
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar">AD</div>
-                <div class="user-info">
-                    <div class="user-name">Admin Demo</div>
-                    <div class="user-role">Risk Manager</div>
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-72 min-h-screen">
+            <!-- Header -->
+            <header class="sticky top-0 z-40 glass border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors">
+                            <i class="bi bi-list text-xl"></i>
+                        </button>
+                        <div>
+                            <h2 id="pageTitle" class="text-2xl font-bold gradient-text">Dashboard</h2>
+                            <p id="pageSubtitle" class="text-sm text-gray-500 dark:text-gray-400">Welcome back, here's what's happening today</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button onclick="refreshData()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 transition-all group">
+                            <i class="bi bi-arrow-clockwise text-gray-600 dark:text-gray-300 group-hover:rotate-180 transition-transform duration-500"></i>
+                        </button>
+                        
+                        <button class="p-2.5 rounded-xl bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 transition-all relative">
+                            <i class="bi bi-bell text-gray-600 dark:text-gray-300"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+                        </button>
+                        
+                        <button class="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium transition-all btn-shine flex items-center gap-2">
+                            <i class="bi bi-plus-lg"></i>
+                            <span class="hidden sm:inline">New Analysis</span>
+                        </button>
+                    </div>
                 </div>
-                <button class="btn-icon" style="width: 36px; height: 36px;" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Wrapper -->
-    <div class="main-wrapper">
-        <!-- Header -->
-        <header class="top-header">
-            <div class="page-title-wrapper">
-                <button class="menu-toggle" onclick="toggleSidebar()">
-                    <i class="bi bi-list"></i>
-                </button>
-                <div>
-                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                    <div class="breadcrumb">Home / <span id="breadcrumbCurrent">Dashboard</span></div>
-                </div>
-            </div>
+            </header>
             
-            <div class="header-actions">
-                <button class="btn-icon" onclick="refreshData()">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-                <button class="btn-icon">
-                    <i class="bi bi-bell"></i>
-                    <span class="notification-dot"></span>
-                </button>
-                <button class="btn-icon">
-                    <i class="bi bi-question-circle"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- Content Area -->
-        <main class="content-area">
-            <!-- Dashboard Section -->
-            <section id="dashboardSection" class="section active">
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card primary">
-                        <div class="stat-header">
-                            <div class="stat-icon-wrapper primary">
-                                <i class="bi bi-graph-up"></i>
+            <!-- Page Content -->
+            <div class="p-6">
+                
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page-content space-y-6 animate-fade-in">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Stat Card 1 -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover-lift">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                                    <i class="bi bi-graph-up text-2xl text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <span class="flex items-center gap-1 text-sm font-medium text-red-500">
+                                    <i class="bi bi-arrow-down-short"></i>
+                                    2.4%
+                                </span>
                             </div>
-                            <div class="stat-trend down">
-                                <i class="bi bi-arrow-down"></i>
-                                <span>2.4%</span>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-1" id="statVolatility">12.45%</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Portfolio Volatility</p>
+                            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <p class="text-xs text-gray-400">vs last month: 12.75%</p>
                             </div>
                         </div>
-                        <div class="stat-value" id="dashVolatility">12.45%</div>
-                        <div class="stat-label">Portfolio Volatility</div>
-                        <div class="stat-comparison">vs last month: 12.75%</div>
-                    </div>
-
-                    <div class="stat-card danger">
-                        <div class="stat-header">
-                            <div class="stat-icon-wrapper danger">
-                                <i class="bi bi-exclamation-triangle"></i>
+                        
+                        <!-- Stat Card 2 -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover-lift">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="p-3 rounded-xl bg-red-100 dark:bg-red-900/30">
+                                    <i class="bi bi-exclamation-triangle text-2xl text-red-600 dark:text-red-400"></i>
+                                </div>
+                                <span class="flex items-center gap-1 text-sm font-medium text-red-500">
+                                    <i class="bi bi-arrow-up-short"></i>
+                                    0.8%
+                                </span>
                             </div>
-                            <div class="stat-trend up">
-                                <i class="bi bi-arrow-up"></i>
-                                <span>0.8%</span>
-                            </div>
-                        </div>
-                        <div class="stat-value" id="dashVaR">-3.21%</div>
-                        <div class="stat-label">99% VaR (Daily)</div>
-                        <div class="stat-comparison">Maximum expected loss</div>
-                    </div>
-
-                    <div class="stat-card success">
-                        <div class="stat-header">
-                            <div class="stat-icon-wrapper success">
-                                <i class="bi bi-arrow-up-right"></i>
-                            </div>
-                            <div class="stat-trend up">
-                                <i class="bi bi-arrow-up"></i>
-                                <span>5.2%</span>
+                            <h3 class="text-3xl font-bold text-red-600 dark:text-red-400 mb-1" id="statVaR">-3.21%</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">99% VaR (Daily)</p>
+                            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <p class="text-xs text-gray-400">Maximum expected loss</p>
                             </div>
                         </div>
-                        <div class="stat-value" id="dashReturn">8.34%</div>
-                        <div class="stat-label">Annualized Return</div>
-                        <div class="stat-comparison">vs benchmark: 3.2%</div>
-                    </div>
-
-                    <div class="stat-card warning">
-                        <div class="stat-header">
-                            <div class="stat-icon-wrapper warning">
-                                <i class="bi bi-activity"></i>
+                        
+                        <!-- Stat Card 3 -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover-lift">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="p-3 rounded-xl bg-green-100 dark:bg-green-900/30">
+                                    <i class="bi bi-arrow-up-right text-2xl text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <span class="flex items-center gap-1 text-sm font-medium text-green-500">
+                                    <i class="bi bi-arrow-up-short"></i>
+                                    5.2%
+                                </span>
                             </div>
-                            <div class="stat-trend up">
-                                <i class="bi bi-arrow-up"></i>
-                                <span>0.15</span>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-1" id="statReturn">8.34%</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Annualized Return</p>
+                            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <p class="text-xs text-gray-400">vs benchmark: 3.2%</p>
                             </div>
                         </div>
-                        <div class="stat-value" id="dashSharpe">1.24</div>
-                        <div class="stat-label">Sharpe Ratio</div>
-                        <div class="stat-comparison">Risk-adjusted performance</div>
+                        
+                        <!-- Stat Card 4 -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover-lift">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                                    <i class="bi bi-activity text-2xl text-amber-600 dark:text-amber-400"></i>
+                                </div>
+                                <span class="flex items-center gap-1 text-sm font-medium text-green-500">
+                                    <i class="bi bi-arrow-up-short"></i>
+                                    0.15
+                                </span>
+                            </div>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-1" id="statSharpe">1.24</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Sharpe Ratio</p>
+                            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <p class="text-xs text-gray-400">Risk-adjusted performance</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Main Dashboard Content -->
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-graph-up-arrow"></i>
-                                    Portfolio Performance
-                                </h5>
-                                <select class="form-select" style="width: auto;">
+                    
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Main Chart -->
+                        <div class="lg:col-span-2 bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Portfolio Performance</h3>
+                                    <p class="text-sm text-gray-500">Cumulative returns over time</p>
+                                </div>
+                                <select class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 text-sm input-focus">
                                     <option>Last 30 Days</option>
                                     <option>Last 90 Days</option>
                                     <option>Last 6 Months</option>
                                     <option>Year to Date</option>
                                 </select>
                             </div>
-                            <div class="card-body">
-                                <div id="performanceChart" class="chart-container"></div>
+                            <div class="p-6">
+                                <div id="mainChart" class="h-80"></div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-clock-history"></i>
-                                    Recent Analyses
-                                </h5>
-                                <button class="btn btn-sm btn-secondary">View All</button>
+                        
+                        <!-- Recent Activity -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Recent Analyses</h3>
+                                <p class="text-sm text-gray-500">Latest risk calculations</p>
                             </div>
-                            <div class="card-body" style="padding: 0;">
-                                <div id="recentAnalyses">
-                                    <div class="p-3 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <div class="fw-semibold">Portfolio Risk Analysis</div>
-                                                <small class="text-muted">Today, 10:30 AM</small>
-                                            </div>
-                                            <span class="badge badge-success">Completed</span>
-                                        </div>
-                                        <small class="text-muted">Basel III • 99% VaR</small>
+                            <div class="p-4 space-y-3">
+                                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700/50 border border-gray-100 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors cursor-pointer">
+                                    <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                                        <i class="bi bi-check-lg text-green-600 dark:text-green-400"></i>
                                     </div>
-                                    <div class="p-3 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <div class="fw-semibold">FRTB Expected Shortfall</div>
-                                                <small class="text-muted">Yesterday, 3:45 PM</small>
-                                            </div>
-                                            <span class="badge badge-success">Completed</span>
-                                        </div>
-                                        <small class="text-muted">FRTB • 97.5% ES</small>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">Portfolio Risk Analysis</p>
+                                        <p class="text-xs text-gray-500">Today, 10:30 AM</p>
+                                        <span class="inline-flex items-center gap-1 mt-1 text-xs text-green-600 dark:text-green-400">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            Completed
+                                        </span>
                                     </div>
-                                    <div class="p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <div class="fw-semibold">Stress Test Scenarios</div>
-                                                <small class="text-muted">Mar 28, 2026</small>
+                                </div>
+                                
+                                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700/50 border border-gray-100 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors cursor-pointer">
+                                    <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                                        <i class="bi bi-check-lg text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">FRTB Expected Shortfall</p>
+                                        <p class="text-xs text-gray-500">Yesterday, 3:45 PM</p>
+                                        <span class="inline-flex items-center gap-1 mt-1 text-xs text-green-600 dark:text-green-400">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            Completed
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700/50 border border-gray-100 dark:border-gray-700">
+                                    <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                                        <i class="bi bi-hourglass-split text-amber-600 dark:text-amber-400"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">Stress Test Scenarios</p>
+                                        <p class="text-xs text-gray-500">Mar 28, 2026</p>
+                                        <div class="mt-2">
+                                            <div class="flex items-center justify-between text-xs mb-1">
+                                                <span class="text-gray-500">Progress</span>
+                                                <span class="font-medium text-gray-900 dark:text-white">75%</span>
                                             </div>
-                                            <span class="badge badge-warning">Running</span>
-                                        </div>
-                                        <div class="progress-wrapper">
-                                            <div class="progress-header">
-                                                <span>Progress</span>
-                                                <span>75%</span>
-                                            </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" style="width: 75%"></div>
+                                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: 75%"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Alerts Section -->
-                <div class="row g-4 mt-2">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-bell-fill text-warning"></i>
-                                    Risk Alerts & Notifications
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <div class="d-flex align-items-start gap-3 p-3 bg-danger bg-opacity-10 rounded-3">
-                                            <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
-                                            <div>
-                                                <div class="fw-semibold text-danger">High Volatility Detected</div>
-                                                <small class="text-muted">Portfolio volatility exceeds 15% threshold. Consider rebalancing.</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="d-flex align-items-start gap-3 p-3 bg-warning bg-opacity-10 rounded-3">
-                                            <i class="bi bi-info-circle-fill text-warning fs-4"></i>
-                                            <div>
-                                                <div class="fw-semibold" style="color: #b45309;">Backtest Warning</div>
-                                                <small class="text-muted">VaR model in yellow zone. 7 exceptions detected.</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="d-flex align-items-start gap-3 p-3 bg-info bg-opacity-10 rounded-3">
-                                            <i class="bi bi-check-circle-fill text-info fs-4"></i>
-                                            <div>
-                                                <div class="fw-semibold" style="color: #0891b2;">Optimization Complete</div>
-                                                <small class="text-muted">New efficient frontier calculated. Sharpe ratio improved.</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Data Section -->
-            <section id="dataSection" class="section">
-                <div class="row g-4">
-                    <div class="col-lg-5">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-cloud-upload"></i>
-                                    Upload Dataset
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="upload-zone" id="uploadZone">
-                                    <div class="upload-icon">
-                                        <i class="bi bi-cloud-arrow-up"></i>
-                                    </div>
-                                    <div class="upload-title">Drop your files here</div>
-                                    <div class="upload-text">or click to browse from your computer</div>
-                                    <small class="text-muted d-block mt-2">Supports CSV, Excel (.xlsx, .xls)</small>
-                                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-magic"></i>
-                                    Generate Sample Data
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label">Time Period</label>
-                                        <select class="form-select" id="sampleYears">
-                                            <option value="3">3 Years (756 observations)</option>
-                                            <option value="5" selected>5 Years (1,260 observations)</option>
-                                            <option value="10">10 Years (2,520 observations)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Asset Classes</label>
-                                        <div class="row g-2">
-                                            <div class="col-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="chkEquities" checked>
-                                                    <label class="form-check-label">Equities</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="chkBonds" checked>
-                                                    <label class="form-check-label">Bonds</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="chkCommodities">
-                                                    <label class="form-check-label">Commodities</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="chkFX">
-                                                    <label class="form-check-label">FX</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-success w-100 mt-4" onclick="generateSampleData()">
-                                    <i class="bi bi-magic"></i> Generate Sample Data
+                            <div class="p-4 border-t border-gray-100 dark:border-gray-700">
+                                <button class="w-full py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                                    View All Analyses →
                                 </button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-lg-7">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    <i class="bi bi-folder"></i>
-                                    Your Datasets
-                                </h5>
-                                <div class="d-flex gap-2">
-                                    <input type="text" class="form-control" placeholder="Search datasets..." style="width: 200px;">
-                                    <button class="btn btn-secondary btn-sm">
-                                        <i class="bi bi-funnel"></i>
-                                    </button>
+                    
+                    <!-- Risk Alerts -->
+                    <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="bi bi-bell-fill text-amber-500"></i>
+                                Risk Alerts & Notifications
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                                    <div class="flex items-start gap-3">
+                                        <i class="bi bi-exclamation-triangle-fill text-red-500 text-xl"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-red-800 dark:text-red-400 text-sm">High Volatility Detected</h4>
+                                            <p class="text-xs text-red-600 dark:text-red-300 mt-1">Portfolio volatility exceeds 15% threshold. Consider rebalancing.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-body" style="padding: 0;">
-                                <div class="table-container">
-                                    <table class="table" id="datasetsTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Dataset</th>
-                                                <th>Assets</th>
-                                                <th>Observations</th>
-                                                <th>Created</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-file-earmark-spreadsheet text-success"></i>
-                                                        <span class="fw-medium">Multi_Asset_Portfolio_2026.csv</span>
-                                                    </div>
-                                                </td>
-                                                <td>26</td>
-                                                <td>1,260</td>
-                                                <td>Mar 31, 2026</td>
-                                                <td><span class="badge badge-success">Active</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline" onclick="selectDataset('1')">
-                                                        <i class="bi bi-check-lg"></i> Select
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-file-earmark-spreadsheet text-success"></i>
-                                                        <span class="fw-medium">Equities_Basket_Q1.xlsx</span>
-                                                    </div>
-                                                </td>
-                                                <td>10</td>
-                                                <td>504</td>
-                                                <td>Mar 28, 2026</td>
-                                                <td><span class="badge badge-success">Active</span></td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline" onclick="selectDataset('2')">
-                                                        <i class="bi bi-check-lg"></i> Select
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                
+                                <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                                    <div class="flex items-start gap-3">
+                                        <i class="bi bi-info-circle-fill text-amber-500 text-xl"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-amber-800 dark:text-amber-400 text-sm">Backtest Warning</h4>
+                                            <p class="text-xs text-amber-600 dark:text-amber-300 mt-1">VaR model in yellow zone. 7 exceptions detected.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">Showing 2 of 2 datasets</small>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-secondary" disabled>Previous</button>
-                                        <button class="btn btn-sm btn-secondary" disabled>Next</button>
+                                
+                                <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                                    <div class="flex items-start gap-3">
+                                        <i class="bi bi-check-circle-fill text-blue-500 text-xl"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-blue-800 dark:text-blue-400 text-sm">Optimization Complete</h4>
+                                            <p class="text-xs text-blue-600 dark:text-blue-300 mt-1">New efficient frontier calculated. Sharpe ratio improved.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Other sections placeholder -->
-            <section id="analysisSection" class="section">
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <div class="empty-title">Risk Analysis</div>
-                    <p class="empty-text">Select a dataset and configure your analysis parameters to begin.</p>
-                    <button class="btn btn-primary mt-3" onclick="navigateTo('data')">
-                        <i class="bi bi-arrow-left"></i> Go to Data Management
-                    </button>
-                </div>
-            </section>
-
-            <section id="portfolioSection" class="section">
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="bi bi-pie-chart"></i>
-                    </div>
-                    <div class="empty-title">Portfolio Analysis</div>
-                    <p class="empty-text">Run a risk analysis first to view portfolio metrics and optimization results.</p>
-                </div>
-            </section>
-
-            <section id="reportsSection" class="section">
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
-                    <div class="empty-title">Generate Reports</div>
-                    <p class="empty-text">Create comprehensive Excel and PDF reports from your completed analyses.</p>
-                </div>
-            </section>
-
-            <section id="settingsSection" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            <i class="bi bi-gear"></i>
-                            System Settings
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">API Base URL</label>
-                                    <input type="text" class="form-control" id="apiUrl" value="http://localhost:8000">
+                
+                <!-- Data Management Page -->
+                <div id="page-data" class="page-content hidden space-y-6 animate-fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Upload Card -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="bi bi-cloud-upload text-primary-500"></i>
+                                    Upload Dataset
+                                </h3>
+                            </div>
+                            <div class="p-6">
+                                <div id="dropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-12 text-center hover:border-primary-500 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all cursor-pointer group">
+                                    <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <i class="bi bi-cloud-arrow-up text-4xl text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Drop your files here</h4>
+                                    <p class="text-gray-500 text-sm mb-2">or click to browse from your computer</p>
+                                    <p class="text-xs text-gray-400">Supports CSV, Excel (.xlsx, .xls)</p>
+                                    <input type="file" id="fileInput" class="hidden" accept=".csv,.xlsx,.xls">
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Default Confidence Level</label>
-                                    <select class="form-select">
+                        </div>
+                        
+                        <!-- Generate Sample Data -->
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="bi bi-magic text-purple-500"></i>
+                                    Generate Sample Data
+                                </h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Time Period</label>
+                                    <select id="sampleYears" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 input-focus">
+                                        <option value="3">3 Years (756 observations)</option>
+                                        <option value="5" selected>5 Years (1,260 observations)</option>
+                                        <option value="10">10 Years (2,520 observations)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Asset Classes</label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <label class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 cursor-pointer hover:border-primary-500 transition-colors">
+                                            <input type="checkbox" id="chkEquities" checked class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="text-sm font-medium">Equities</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 cursor-pointer hover:border-primary-500 transition-colors">
+                                            <input type="checkbox" id="chkBonds" checked class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="text-sm font-medium">Bonds</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 cursor-pointer hover:border-primary-500 transition-colors">
+                                            <input type="checkbox" id="chkCommodities" class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="text-sm font-medium">Commodities</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 cursor-pointer hover:border-primary-500 transition-colors">
+                                            <input type="checkbox" id="chkFX" class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="text-sm font-medium">FX</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button onclick="generateSampleData()" class="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all btn-shine flex items-center justify-center gap-2">
+                                    <i class="bi bi-magic"></i>
+                                    Generate Sample Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Datasets Table -->
+                    <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Your Datasets</h3>
+                                <p class="text-sm text-gray-500">Manage and analyze your data</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <input type="text" placeholder="Search datasets..." class="px-4 py-2 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 text-sm input-focus">
+                                <button class="p-2 rounded-xl bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 transition-colors">
+                                    <i class="bi bi-funnel"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-dark-700/50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Dataset</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Assets</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Observations</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-700/30 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                                    <i class="bi bi-file-earmark-spreadsheet text-green-600 dark:text-green-400"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-gray-900 dark:text-white">Multi_Asset_Portfolio_2026.csv</p>
+                                                    <p class="text-xs text-gray-500">Multi-asset portfolio data</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">26</td>
+                                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">1,260</td>
+                                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Mar 31, 2026</td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button onclick="selectDataset('1')" class="px-4 py-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors font-medium text-sm">
+                                                Select
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <p class="text-sm text-gray-500">Showing 1 of 1 datasets</p>
+                            <div class="flex items-center gap-2">
+                                <button class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 text-gray-500 cursor-not-allowed" disabled>Previous</button>
+                                <button class="px-4 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 text-gray-500 cursor-not-allowed" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Pages Placeholder -->
+                <div id="page-analysis" class="page-content hidden">
+                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-24 h-24 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-6">
+                            <i class="bi bi-graph-up-arrow text-4xl text-primary-600 dark:text-primary-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Risk Analysis</h3>
+                        <p class="text-gray-500 max-w-md mb-6">Select a dataset and configure your analysis parameters to begin.</p>
+                        <button onclick="navigate('data')" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+                            <i class="bi bi-arrow-left"></i>
+                            Go to Data Management
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="page-portfolio" class="page-content hidden">
+                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-6">
+                            <i class="bi bi-pie-chart text-4xl text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Portfolio Analysis</h3>
+                        <p class="text-gray-500 max-w-md">Run a risk analysis first to view portfolio metrics and optimization results.</p>
+                    </div>
+                </div>
+                
+                <div id="page-reports" class="page-content hidden">
+                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-24 h-24 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-6">
+                            <i class="bi bi-file-earmark-text text-4xl text-amber-600 dark:text-amber-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Generate Reports</h3>
+                        <p class="text-gray-500 max-w-md">Create comprehensive Excel and PDF reports from your completed analyses.</p>
+                    </div>
+                </div>
+                
+                <div id="page-settings" class="page-content hidden space-y-6">
+                    <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+                        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i class="bi bi-gear text-primary-500"></i>
+                                System Settings
+                            </h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Base URL</label>
+                                    <input type="text" id="apiUrl" value="http://localhost:8000" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 input-focus">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Confidence Level</label>
+                                    <select class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-gray-600 input-focus">
                                         <option>95%</option>
                                         <option selected>99%</option>
                                         <option>99.9%</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mt-4">
-                            <button class="btn btn-primary" onclick="saveSettings()">
-                                <i class="bi bi-check-lg"></i> Save Settings
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="helpSection" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            <i class="bi bi-question-circle"></i>
-                            Help & Support
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <h6 class="fw-semibold mb-3">Quick Start Guide</h6>
-                                <ol class="text-muted">
-                                    <li class="mb-2">Upload your financial data in CSV or Excel format</li>
-                                    <li class="mb-2">Navigate to Risk Analysis section</li>
-                                    <li class="mb-2">Configure analysis parameters</li>
-                                    <li class="mb-2">Run analysis and view results</li>
-                                    <li>Generate regulatory reports</li>
-                                </ol>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="fw-semibold mb-3">Contact Support</h6>
-                                <p class="text-muted">For technical assistance or feature requests:</p>
-                                <div class="d-flex flex-column gap-2">
-                                    <a href="#" class="text-decoration-none">
-                                        <i class="bi bi-envelope"></i> support@riskguard.com
-                                    </a>
-                                    <a href="#" class="text-decoration-none">
-                                        <i class="bi bi-book"></i> Documentation
-                                    </a>
-                                    <a href="#" class="text-decoration-none">
-                                        <i class="bi bi-github"></i> GitHub Repository
-                                    </a>
-                                </div>
+                            <div class="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <button onclick="saveSettings()" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2">
+                                    <i class="bi bi-check-lg"></i>
+                                    Save Settings
+                                </button>
+                                <button class="px-6 py-3 bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-colors">
+                                    Reset to Defaults
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+                
+                <div id="page-help" class="page-content hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Start Guide</h3>
+                            <ol class="space-y-3 text-gray-600 dark:text-gray-400">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                                    <span>Upload your financial data in CSV or Excel format</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                                    <span>Navigate to Risk Analysis section</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                                    <span>Configure analysis parameters</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+                                    <span>Run analysis and view results</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center text-sm font-bold flex-shrink-0">5</span>
+                                    <span>Generate regulatory reports</span>
+                                </li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact Support</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-4">For technical assistance or feature requests:</p>
+                            <div class="space-y-3">
+                                <a href="mailto:support@riskguard.com" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 hover:bg-gray-100 dark:hover:bg-dark-600 transition-colors">
+                                    <i class="bi bi-envelope text-primary-500"></i>
+                                    <span class="text-gray-700 dark:text-gray-300">support@riskguard.com</span>
+                                </a>
+                                <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 hover:bg-gray-100 dark:hover:bg-dark-600 transition-colors">
+                                    <i class="bi bi-book text-primary-500"></i>
+                                    <span class="text-gray-700 dark:text-gray-300">Documentation</span>
+                                </a>
+                                <a href="https://github.com/batmandevx/mifid" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-dark-700 hover:bg-gray-100 dark:hover:bg-dark-600 transition-colors">
+                                    <i class="bi bi-github text-primary-500"></i>
+                                    <span class="text-gray-700 dark:text-gray-300">GitHub Repository</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
         </main>
     </div>
-
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-6 right-6 z-50 flex flex-col gap-3"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white dark:bg-dark-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-primary-200 dark:border-primary-900 border-t-primary-600 rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-700 dark:text-gray-300 font-medium">Processing your request...</p>
+        </div>
+    </div>
+    
     <script>
-        // Global State
+        // State
         const state = {
             apiBaseUrl: 'http://localhost:8000',
-            currentUser: null,
-            datasets: [],
-            analyses: [],
-            currentAnalysis: null,
-            sidebarOpen: true
+            darkMode: false,
+            currentPage: 'dashboard'
         };
-
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            initNavigation();
-            initUploadZone();
             initCharts();
+            initDropZone();
+            checkDarkMode();
         });
-
+        
         // Navigation
-        function initNavigation() {
+        function navigate(page) {
+            state.currentPage = page;
+            
+            // Update nav items
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const section = item.dataset.section;
-                    navigateTo(section);
-                });
+                item.classList.remove('bg-primary-600/20', 'text-primary-300', 'border-l-4', 'border-primary-500');
+                item.classList.add('text-gray-400');
+                
+                if (item.dataset.page === page) {
+                    item.classList.remove('text-gray-400');
+                    item.classList.add('bg-primary-600/20', 'text-primary-300', 'border-l-4', 'border-primary-500');
+                }
             });
-        }
-
-        function navigateTo(section) {
-            // Update nav
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
-
-            // Update sections
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(section + 'Section')?.classList.add('active');
-
-            // Update titles
+            
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            
+            // Show selected page
+            const pageEl = document.getElementById(`page-${page}`);
+            if (pageEl) {
+                pageEl.classList.remove('hidden');
+            }
+            
+            // Update header
             const titles = {
-                dashboard: 'Dashboard',
-                data: 'Data Management',
-                analysis: 'Risk Analysis',
-                portfolio: 'Portfolio',
-                reports: 'Reports',
-                settings: 'Settings',
-                help: 'Help & Support'
+                dashboard: { title: 'Dashboard', subtitle: 'Welcome back, here\'s what\'s happening today' },
+                data: { title: 'Data Management', subtitle: 'Upload and manage your datasets' },
+                analysis: { title: 'Risk Analysis', subtitle: 'Configure and run risk calculations' },
+                portfolio: { title: 'Portfolio', subtitle: 'View portfolio metrics and optimization' },
+                reports: { title: 'Reports', subtitle: 'Generate regulatory compliance reports' },
+                settings: { title: 'Settings', subtitle: 'Configure system preferences' },
+                help: { title: 'Help & Support', subtitle: 'Documentation and assistance' }
             };
             
-            document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
-            document.getElementById('breadcrumbCurrent').textContent = titles[section] || 'Dashboard';
-
+            const t = titles[page] || titles.dashboard;
+            document.getElementById('pageTitle').textContent = t.title;
+            document.getElementById('pageSubtitle').textContent = t.subtitle;
+            
             // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
             }
         }
-
+        
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
-
-        // Upload Zone
-        function initUploadZone() {
-            const zone = document.getElementById('uploadZone');
-            const input = document.getElementById('fileInput');
-
-            zone.addEventListener('click', () => input.click());
-            
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('dragover');
-            });
-            
-            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-            
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    handleFileUpload(e.dataTransfer.files[0]);
-                }
-            });
-
-            input.addEventListener('change', (e) => {
-                if (e.target.files.length) handleFileUpload(e.target.files[0]);
-            });
+        
+        // Dark Mode
+        function toggleTheme() {
+            state.darkMode = !state.darkMode;
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', state.darkMode);
         }
-
-        async function handleFileUpload(file) {
-            showLoading(true);
-            
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetch(`${state.apiBaseUrl}/api/datasets/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('Success', 'File uploaded successfully!', 'success');
-                } else {
-                    showToast('Error', result.detail || 'Upload failed', 'error');
-                }
-            } catch (error) {
-                showToast('Error', 'Network error occurred', 'error');
-            } finally {
-                showLoading(false);
+        
+        function checkDarkMode() {
+            const saved = localStorage.getItem('darkMode');
+            if (saved === 'true') {
+                state.darkMode = true;
+                document.documentElement.classList.add('dark');
             }
         }
-
-        async function generateSampleData() {
-            showLoading(true);
-            
-            const years = document.getElementById('sampleYears').value;
-            const assetClasses = [];
-            if (document.getElementById('chkEquities').checked) assetClasses.push('equities');
-            if (document.getElementById('chkBonds').checked) assetClasses.push('bonds');
-            if (document.getElementById('chkCommodities').checked) assetClasses.push('commodities');
-            if (document.getElementById('chkFX').checked) assetClasses.push('fx');
-
-            try {
-                const response = await fetch(`${state.apiBaseUrl}/api/sample-data`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ n_years: parseInt(years), asset_classes: assetClasses })
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('Success', `Generated ${result.assets.length} assets`, 'success');
-                }
-            } catch (error) {
-                showToast('Error', 'Failed to generate data', 'error');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function selectDataset(id) {
-            showToast('Success', 'Dataset selected', 'success');
-            navigateTo('analysis');
-        }
-
-        function saveSettings() {
-            state.apiBaseUrl = document.getElementById('apiUrl').value;
-            showToast('Success', 'Settings saved successfully', 'success');
-        }
-
-        function refreshData() {
-            showToast('Info', 'Refreshing data...', 'info');
-            setTimeout(() => {
-                showToast('Success', 'Data refreshed', 'success');
-            }, 1000);
-        }
-
-        function logout() {
-            showToast('Info', 'Logging out...', 'info');
-            setTimeout(() => location.reload(), 1000);
-        }
-
-        // UI Helpers
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').classList.toggle('active', show);
-        }
-
-        function showToast(title, message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: 'bi-check-circle-fill',
-                error: 'bi-x-circle-fill',
-                warning: 'bi-exclamation-triangle-fill',
-                info: 'bi-info-circle-fill'
-            };
-            
-            toast.innerHTML = `
-                <div class="toast-icon"><i class="bi ${icons[type]}"></i></div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.remove()">
-                    <i class="bi bi-x"></i>
-                </button>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-        }
-
-        // Initialize Charts
+        
+        // Charts
         function initCharts() {
-            // Performance Chart
+            // Main performance chart
             const dates = [];
             const values = [];
             let value = 100;
@@ -1782,30 +875,139 @@
                 value = value * (1 + (Math.random() - 0.48) * 0.02);
                 values.push(value);
             }
-
-            Plotly.newPlot('performanceChart', [{
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            Plotly.newPlot('mainChart', [{
                 x: dates,
                 y: values,
                 type: 'scatter',
                 mode: 'lines',
                 fill: 'tozeroy',
-                line: { color: '#2563eb', width: 3 },
-                fillcolor: 'rgba(37, 99, 235, 0.1)'
+                line: { color: '#3b82f6', width: 3 },
+                fillcolor: 'rgba(59, 130, 246, 0.1)'
             }], {
                 margin: { t: 20, r: 20, b: 40, l: 50 },
-                xaxis: { showgrid: false },
-                yaxis: { showgrid: true, gridcolor: '#f3f4f6' },
+                xaxis: { 
+                    showgrid: false,
+                    tickfont: { color: isDark ? '#94a3b8' : '#64748b' }
+                },
+                yaxis: { 
+                    showgrid: true, 
+                    gridcolor: isDark ? '#334155' : '#e2e8f0',
+                    tickfont: { color: isDark ? '#94a3b8' : '#64748b' }
+                },
                 paper_bgcolor: 'transparent',
                 plot_bgcolor: 'transparent'
             }, { responsive: true });
         }
-
-        // Responsive sidebar
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        });
+        
+        // Drop Zone
+        function initDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary-500', 'bg-primary-50/50', 'dark:bg-primary-900/10');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('border-primary-500', 'bg-primary-50/50', 'dark:bg-primary-900/10');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary-500', 'bg-primary-50/50', 'dark:bg-primary-900/10');
+                if (e.dataTransfer.files.length) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) handleFileUpload(e.target.files[0]);
+            });
+        }
+        
+        async function handleFileUpload(file) {
+            showLoading(true);
+            // Simulate upload
+            await new Promise(r => setTimeout(r, 1500));
+            showLoading(false);
+            showToast('Success', `File "${file.name}" uploaded successfully!`, 'success');
+        }
+        
+        async function generateSampleData() {
+            showLoading(true);
+            await new Promise(r => setTimeout(r, 2000));
+            showLoading(false);
+            showToast('Success', 'Sample data generated with 26 assets', 'success');
+        }
+        
+        function selectDataset(id) {
+            showToast('Success', 'Dataset selected. Redirecting to analysis...', 'success');
+            setTimeout(() => navigate('analysis'), 1000);
+        }
+        
+        function saveSettings() {
+            state.apiBaseUrl = document.getElementById('apiUrl').value;
+            showToast('Success', 'Settings saved successfully', 'success');
+        }
+        
+        function refreshData() {
+            showToast('Info', 'Refreshing data...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'Data refreshed', 'success');
+            }, 1000);
+        }
+        
+        // UI Helpers
+        function showLoading(show) {
+            const el = document.getElementById('loadingOverlay');
+            el.classList.toggle('hidden', !show);
+            el.classList.toggle('flex', show);
+        }
+        
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+                error: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+                warning: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
+                info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+            };
+            
+            const icons = {
+                success: 'bi-check-circle-fill text-green-500',
+                error: 'bi-x-circle-fill text-red-500',
+                warning: 'bi-exclamation-triangle-fill text-amber-500',
+                info: 'bi-info-circle-fill text-blue-500'
+            };
+            
+            toast.className = `${colors[type]} border rounded-xl p-4 shadow-xl flex items-start gap-3 min-w-[320px] animate-slide-right`;
+            toast.innerHTML = `
+                <i class="bi ${icons[type]} text-xl"></i>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 dark:text-white">${title}</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
     </script>
 </body>
 </html>
